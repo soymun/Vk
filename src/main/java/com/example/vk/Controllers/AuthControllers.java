@@ -4,6 +4,8 @@ import com.example.vk.DTO.AuthDTO;
 import com.example.vk.DTO.RegDTO;
 import com.example.vk.Entity.Role;
 import com.example.vk.Entity.User;
+import com.example.vk.Security.JWTAuthException;
+import com.example.vk.Security.JWTTokenProvider;
 import com.example.vk.Service.Implaye.UserServiceImp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -29,6 +33,8 @@ public class AuthControllers {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     @Autowired
+    private JWTTokenProvider jwtTokenProvider;
+    @Autowired
     public AuthControllers(UserServiceImp userServiceImp, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
         this.userServiceImp = userServiceImp;
         this.passwordEncoder = passwordEncoder;
@@ -36,7 +42,7 @@ public class AuthControllers {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<String> getUsers(@RequestBody RegDTO regDTO){
+    public ResponseEntity<String> registration(@RequestBody RegDTO regDTO){
         User user = userServiceImp.getUserByUsername(regDTO.getEmail());
         if(user != null){
             throw new RuntimeException("With this email, the user already exists");
@@ -54,13 +60,23 @@ public class AuthControllers {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/auth")
-    public ResponseEntity<String> auth(@RequestBody AuthDTO authDTO){
-        if(authDTO == null){
-            throw new RuntimeException("Null email and password");
+    @PostMapping("/login")
+    public ResponseEntity<?> auth(@RequestBody AuthDTO authDTO){
+        try {
+            if (authDTO == null) {
+                throw new RuntimeException("Null email and password");
+            }
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authDTO.getEmail(), authDTO.getPassword()));
+            User user = userServiceImp.getUserByUsername(authDTO.getEmail());
+            String token = jwtTokenProvider.createToken(user.getEmail(), user.getRoles().get(0));
+            Map<Object, Object> response = new HashMap<>();
+            response.put("id", user.getId());
+            response.put("name", user.getName());
+            response.put("token", token);
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            throw new JWTAuthException("No token");
         }
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authDTO.getEmail(), authDTO.getPassword()));
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/logout")

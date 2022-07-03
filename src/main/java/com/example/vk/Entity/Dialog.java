@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,16 +21,14 @@ public class Dialog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dialogs_id;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name="userdialogs", joinColumns = @JoinColumn(name = "id"),
-                inverseJoinColumns = @JoinColumn(name = "dialogs_id"))
+    @ManyToMany(mappedBy = "dialogs", fetch = FetchType.LAZY)
     @ToString.Exclude
-    private List<User> userLis;
+    private List<User> userLis= new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "dialog_id")
     @ToString.Exclude
-    private List<Message> messages;
+    private List<Message> messages = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
@@ -42,5 +41,9 @@ public class Dialog {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    public void addUser(User user){
+        userLis.add(user);
     }
 }

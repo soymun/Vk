@@ -45,8 +45,8 @@ public class User {
     private List<Role> roles;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name="userdialogs", joinColumns = @JoinColumn(name = "dialogs_id"),
-                inverseJoinColumns = @JoinColumn(name = "id"))
+    @JoinTable(name="userdialogs", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+                inverseJoinColumns = @JoinColumn(name = "dialogs_id", referencedColumnName = "dialogs_id"))
     @ToString.Exclude
     private List<Dialog> dialogs;
 
@@ -61,5 +61,10 @@ public class User {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+
+    public void addDialog(Dialog dialog){
+        dialogs.add(dialog);
     }
 }

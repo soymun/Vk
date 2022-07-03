@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 
 @Service
@@ -35,7 +36,6 @@ public class UserServiceImp implements UserService {
             throw new IllegalArgumentException("Email is null");
         }
         User user = getUserByUsername(username);
-        log.debug(user.toString());
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), user.getRoles());
     }
 
@@ -53,5 +53,10 @@ public class UserServiceImp implements UserService {
     @Override
     public void save(User user){
         userRepository.save(user);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }

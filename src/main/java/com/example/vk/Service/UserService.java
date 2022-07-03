@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface UserService extends UserDetailsService {
     @Override
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
@@ -18,4 +20,7 @@ public interface UserService extends UserDetailsService {
 
     @Transactional
     void save(User user);
+
+    @Transactional
+    List<User> findAll();
 }
