@@ -27,4 +27,9 @@ public class DialogsServiceImp implements DialogsService {
     public void delete(Dialog dialog) {
         dialogsRepository.delete(dialog);
     }
+
+    @Transactional
+    public Dialog findDialogById(Long id){
+        return dialogsRepository.findDialogByDialogs_id(id);
+    }
 }

@@ -46,4 +46,8 @@ public class Dialog {
     public void addUser(User user){
         userLis.add(user);
     }
+
+    public void addMessage(Message message){
+        messages.add(message);
+    }
 }
