@@ -20,7 +20,7 @@ import java.util.Date;
 @Component
 public class JWTTokenProvider {
 
-    private UserServiceImp userServiceImp;
+    private final UserServiceImp userServiceImp;
     @Autowired
     public JWTTokenProvider(UserServiceImp userServiceImp) {
         this.userServiceImp = userServiceImp;
@@ -36,7 +36,7 @@ public class JWTTokenProvider {
 
     public String createToken(String userName, Role role){
         Claims claims = Jwts.claims().setSubject(userName);
-        claims.put("roles", role.getAuthority());
+        claims.put("roles", role);
 
         Date date = new Date();
         Date validity = new Date(date.getTime() + validityInMillisecond);

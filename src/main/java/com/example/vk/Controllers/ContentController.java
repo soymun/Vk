@@ -1,57 +1,52 @@
 package com.example.vk.Controllers;
 
 
-import com.example.vk.Controllers.Funchional.UserF;
+import com.example.vk.DTO.FromToUser;
 import com.example.vk.DTO.UserDTO;
-import com.example.vk.Entity.User;
-import com.example.vk.Service.Implaye.UserServiceImp;
+import com.example.vk.Facade.UserFacade;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/vk")
+@CrossOrigin(origins="http://localhost:3000")
 public class ContentController {
 
 
-    private final UserServiceImp userServiceImp;
+    private final UserFacade userFacade;
+
     @Autowired
-    public ContentController(UserServiceImp userServiceImp) {
-        this.userServiceImp = userServiceImp;
+    public ContentController(UserFacade userFacade) {
+        this.userFacade = userFacade;
     }
 
     @GetMapping("/profile/{id}")
     public ResponseEntity<?> getProfile(@PathVariable("id") Long id){
-        if(id == null){
-            throw new RuntimeException("Id is null");
-        }
-        User user = userServiceImp.getUserById(id);
-        if(user == null){
-               return new ResponseEntity<>(HttpStatus.PERMANENT_REDIRECT);
-        }
-        return ResponseEntity.ok(new UserDTO(user));
+        log.info("");
+        return ResponseEntity.ok(userFacade.getUser(id));
     }
-    @PostMapping("/profile/{id}")
+    @PutMapping("/profile/{id}")
     public ResponseEntity<?> updateProfile(@PathVariable("id") Long id,@RequestBody UserDTO userDTO){
-        if(id == null){
-            throw new RuntimeException("Id is null");
-        }
-        User user = userServiceImp.getUserById(id);
-        if(user == null){
-            return new ResponseEntity<>(HttpStatus.PERMANENT_REDIRECT);
-        }
-        userServiceImp.save(UserF.save(user, userDTO));
-        return ResponseEntity.ok(userDTO);
+        log.info("");
+        return ResponseEntity.ok(userFacade.updateProfile(id, userDTO));
     }
-    @GetMapping("users")
-    public ResponseEntity<?> getUsers(){
-        List<UserDTO> userDTOS = new ArrayList<>();
-        userServiceImp.findAll().forEach(n -> userDTOS.add(new UserDTO(n)));
+    @GetMapping("/users")
+    public ResponseEntity<?> getUsers(@RequestBody FromToUser fromToUser){
+        log.info("");
+        List<UserDTO> userDTOS = userFacade.getUserInRadius(fromToUser.getFrom(), fromToUser.getTo());
         return ResponseEntity.ok(userDTOS);
+    }
+
+    @DeleteMapping("/user/delete/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id){
+        log.info("");
+        userFacade.deleteUserById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

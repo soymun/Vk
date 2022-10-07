@@ -1,0 +1,18 @@
+.descriptionBlock{
+    padding: 10px;
+    color: black;
+}
+
+.avaWorkStatus{
+    width: 100px;
+    height: 100px;
+    border-radius: 100px;
+}
+
+.namePhoto{
+    max-width: 300px;
+}
+
+.contact{
+    padding-left: 20px;
+}

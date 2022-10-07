@@ -4,6 +4,7 @@ package com.example.vk.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
 import javax.persistence.*;
 
@@ -13,17 +14,16 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class Follow {
 
-    public Follow(Long userId, Long userTwo) {
-        this.userId = userId;
-        this.userTwo = userTwo;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    private Long userOne;
 
     private Long userTwo;
+
+    public Follow(Long userOne, Long userTwo) {
+        this.userOne = userOne;
+        this.userTwo = userTwo;
+    }
 }

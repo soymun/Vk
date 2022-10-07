@@ -30,6 +30,6 @@ public class DialogsServiceImp implements DialogsService {
 
     @Transactional
     public Dialog findDialogById(Long id){
-        return dialogsRepository.findDialogByDialogs_id(id);
+        return dialogsRepository.findDialogById(id);
     }
 }

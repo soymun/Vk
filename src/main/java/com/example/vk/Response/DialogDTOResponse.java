@@ -1,4 +1,4 @@
-package com.example.vk.DTO.Response;
+package com.example.vk.Response;
 
 import com.example.vk.DTO.UserDTO;
 import com.example.vk.Entity.Dialog;
@@ -13,7 +13,7 @@ public class DialogDTOResponse {
 
 
     public DialogDTOResponse(Dialog dialog){
-        this.dialogs_id = dialog.getDialogs_id();
+        this.dialogs_id = dialog.getId();
         dialog.getUserLis().stream().forEach(n -> userLis.add(new UserDTO(n)));
         this.messages = dialog.getMessages();
     }

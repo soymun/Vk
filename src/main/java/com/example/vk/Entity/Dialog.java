@@ -19,14 +19,13 @@ public class Dialog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long dialogs_id;
+    private Long id;
 
     @ManyToMany(mappedBy = "dialogs", fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<User> userLis= new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "dialog_id")
+    @OneToMany(mappedBy = "dialog",cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<Message> messages = new ArrayList<>();
 
@@ -35,7 +34,7 @@ public class Dialog {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         Dialog dialog = (Dialog) o;
-        return dialogs_id != null && Objects.equals(dialogs_id, dialog.dialogs_id);
+        return id != null && Objects.equals(id, dialog.id);
     }
 
     @Override

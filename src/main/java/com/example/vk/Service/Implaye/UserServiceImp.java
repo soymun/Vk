@@ -2,22 +2,20 @@ package com.example.vk.Service.Implaye;
 
 import com.example.vk.DTO.UserDTO;
 import com.example.vk.Entity.*;
+import com.example.vk.Exeption.NotFoundException;
 import com.example.vk.Repositories.UserRepository;
 import com.example.vk.Service.UserService;
-import com.querydsl.jpa.impl.JPAQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -28,10 +26,13 @@ public class UserServiceImp implements UserService {
     @PersistenceContext
     EntityManager entityManager;
 
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
     @Autowired
-    public UserServiceImp(UserRepository userRepository) {
+    public UserServiceImp(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -40,7 +41,7 @@ public class UserServiceImp implements UserService {
             throw new IllegalArgumentException("Email is null");
         }
         User user = getUserByUsername(username);
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), user.getRoles());
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), user.getRole().getAuthority());
     }
 
     @Override
@@ -64,31 +65,48 @@ public class UserServiceImp implements UserService {
         return userRepository.findAll();
     }
 
+    @Override
+    public User updateUser(User updateUser) {
+        User user = getUserById(updateUser.getId());
+        if (user  == null){
+            throw new NotFoundException(String.format("User with id:%s not found", updateUser.getId()));
+        }
+        else {
+            if(updateUser.getEmail() != null){
+                user.setEmail(updateUser.getEmail());
+            }
+            if(updateUser.getAbout() != null){
+                user.setAbout(updateUser.getAbout());
+            }
+            if(updateUser.getPassword() != null){
+                user.setPassword(passwordEncoder.encode(updateUser.getEmail()));
+            }
+            if(updateUser.getName() != null){
+                user.setName(updateUser.getName());
+            }
+            if(updateUser.getSurname() != null){
+                user.setSurname(updateUser.getSurname());
+            }
+        }
+        save(user);
+        return user;
+    }
+
+    @Override
+    public List<User> getUserInRadius(Long from, Long to) {
+        return null;
+    }
+
+    @Override
+    public void deleteUserById(Long id) {
+
+    }
+
     public List<UserDTO> getFollow(Long id){
-        List<UserDTO> userDTOS = new ArrayList<>();
-        new JPAQuery<User>(entityManager)
-                .select(QUser.user)
-                .from(QUser.user)
-                .where(QUser.user.id.in(new JPAQuery<Follow>(entityManager)
-                        .select(QFollow.follow.userTwo)
-                        .from(QFollow.follow)
-                        .where(QFollow.follow.userId.eq(id))
-                        .fetchAll()))
-                .fetch().forEach(n -> userDTOS.add(new UserDTO(n)));
-        return userDTOS;
+        return null;
     }
 
     public List<Post> getNews(Long id, Long skip, Long limit){
-        List<Post> userDTOS = new ArrayList<>();
-        new JPAQuery<User>(entityManager)
-                .select(QUser.user.posts)
-                .from(QUser.user)
-                .where(QUser.user.id.in(new JPAQuery<Follow>(entityManager)
-                        .select(QFollow.follow.userTwo)
-                        .from(QFollow.follow)
-                        .where(QFollow.follow.userId.eq(id))
-                        .fetchAll()))
-                .fetch().forEach(userDTOS::addAll);
-        return  userDTOS.stream().skip(skip).limit(limit).collect(Collectors.toList());
+        return  null;
     }
 }

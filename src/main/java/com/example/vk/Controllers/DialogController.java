@@ -4,9 +4,8 @@ package com.example.vk.Controllers;
 import com.example.vk.Controllers.Funchional.UserF;
 import com.example.vk.DTO.DialogsDTO;
 import com.example.vk.DTO.MessageDTO;
-import com.example.vk.DTO.Response.DialogDTOResponse;
+import com.example.vk.Response.DialogDTOResponse;
 import com.example.vk.Entity.Dialog;
-import com.example.vk.Entity.Message;
 import com.example.vk.Entity.User;
 import com.example.vk.Service.Implaye.DialogsServiceImp;
 import com.example.vk.Service.Implaye.UserServiceImp;
@@ -56,9 +55,9 @@ public class DialogController {
 
     @PostMapping("/message")
     public ResponseEntity<?> addMessage(@RequestBody MessageDTO messageDTO){
-        Dialog dialog = dialogsServiceImp.findDialogById(messageDTO.getDialogId());
-        dialog.addMessage(new Message(messageDTO));
-        dialogsServiceImp.save(dialog);
+//        Dialog dialog = dialogsServiceImp.findDialogById(messageDTO.getDialogId());
+//        dialog.addMessage(new Message(messageDTO));
+//        dialogsServiceImp.save(dialog);
         return ResponseEntity.ok("Suggest");
     }
 }

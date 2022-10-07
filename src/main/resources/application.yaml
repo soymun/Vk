@@ -1,3 +1,4 @@
+
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -15,3 +16,5 @@ jwt:
   token:
     secret: soymun
     expired: 3600000
+server:
+  port: 3000

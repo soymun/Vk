@@ -1,5 +1,6 @@
 package com.example.vk.Service;
 
+import com.example.vk.DTO.UserDTO;
 import com.example.vk.Entity.Dialog;
 import com.example.vk.Entity.Post;
 import com.example.vk.Entity.User;
@@ -14,8 +15,10 @@ public interface UserService extends UserDetailsService {
     @Override
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 
+    @Transactional
     User getUserByUsername(String username);
 
+    @Transactional
     User getUserById(Long id);
 
     @Transactional
@@ -23,4 +26,13 @@ public interface UserService extends UserDetailsService {
 
     @Transactional
     List<User> findAll();
+
+    @Transactional
+    User updateUser(User updateUser);
+
+    @Transactional
+    List<User> getUserInRadius(Long from, Long to);
+
+    @Transactional
+    void deleteUserById(Long id);
 }
