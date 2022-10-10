@@ -21,6 +21,8 @@ public class Dialog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String dialogName;
+
     @ManyToMany(mappedBy = "dialogs", fetch = FetchType.LAZY)
     @ToString.Exclude
     private List<User> userLis= new ArrayList<>();
@@ -40,13 +42,5 @@ public class Dialog {
     @Override
     public int hashCode() {
         return getClass().hashCode();
-    }
-
-    public void addUser(User user){
-        userLis.add(user);
-    }
-
-    public void addMessage(Message message){
-        messages.add(message);
     }
 }

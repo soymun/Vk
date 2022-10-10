@@ -37,6 +37,7 @@ public class SConfig{
                 .authorizeRequests()
                 .antMatchers("/vk/login").permitAll()
                 .antMatchers("/vk/registration").permitAll()
+                .antMatchers("/swagger-ui/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

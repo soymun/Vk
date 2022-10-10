@@ -1,18 +1,21 @@
 package com.example.vk.Facade;
 
 
-import com.example.vk.Controllers.Funchional.UserF;
-import com.example.vk.DTO.UserDTO;
+import com.example.vk.DTO.PostDto;
+import com.example.vk.DTO.newsDto.News;
+import com.example.vk.DTO.profileDto.UserDTO;
+import com.example.vk.Entity.Post;
 import com.example.vk.Entity.User;
-import com.example.vk.Exeption.NotFoundException;
 import com.example.vk.Mapper.UserDtoMapper;
+import com.example.vk.Repositories.PostRepository;
+import com.example.vk.Response.PostDtoResponse;
 import com.example.vk.Service.Implaye.UserServiceImp;
+import com.example.vk.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -25,26 +28,31 @@ public class UserFacade {
 
     private final UserDtoMapper userDtoMapper;
 
+    private final PostRepository postRepository;
+
     @Autowired
-    public UserFacade(UserServiceImp userServiceImp, UserDtoMapper userDtoMapper) {
+    public UserFacade(UserServiceImp userServiceImp, UserDtoMapper userDtoMapper, PostRepository postRepository) {
         this.userServiceImp = userServiceImp;
         this.userDtoMapper = userDtoMapper;
+        this.postRepository = postRepository;
     }
 
-    public UserDTO getUser(Long id){
-        if(id == null){
+    public UserDTO getUser(Long id) {
+        if (id == null) {
             throw new NotFoundException(String.format("User with id:%s not found", id));
         }
         User user = userServiceImp.getUserById(id);
-        if(user == null){
+        if (user == null) {
             throw new NotFoundException(String.format("User with id:%s not found", id));
         }
         log.info("User found with id:{}", id);
-        return userDtoMapper.userToUserDTO(user);
+        UserDTO userDTO = userDtoMapper.userToUserDTO(user);
+        userDTO.setPosts(user.getPosts().stream().map(userDtoMapper::postToUserPostDto).collect(Collectors.toList()));
+        return userDTO;
     }
 
-    public UserDTO updateProfile(Long id, UserDTO userDTO){
-        if(id == null || userDTO == null){
+    public UserDTO updateProfile(Long id, UserDTO userDTO) {
+        if (id == null || userDTO == null) {
             throw new NotFoundException(String.format("User with id:%s not found", id));
         }
         userDTO.setId(id);
@@ -53,26 +61,48 @@ public class UserFacade {
         return userDtoMapper.userToUserDTO(user);
     }
 
-    public List<UserDTO> getUserInRadius(Long from, Long to){
-        if(from == null || to == null){
+    public List<UserDTO> getUserInRadius(Long userId, Long from, Long to) {
+        if (from == null || to == null) {
             throw new NotFoundException("Users in radius not found");
         }
         log.info("User get in radius from {} to {}", from, to);
-        return userServiceImp.getUserInRadius(from, to)
-                .stream()
-                .filter(Objects::nonNull)
-                .map(userDtoMapper::userToUserDTO)
-                .peek(n -> log.info("In radius user {}", n))
-                .collect(Collectors.toList());
+
+        return userServiceImp.getUserInRadius(userId, from, to).stream().filter(Objects::nonNull).map(userDtoMapper::userListDtoToUserDTO).peek(n -> log.info("In radius user {}", n)).collect(Collectors.toList());
 
     }
 
-    public void deleteUserById(Long userId){
-        if(userId == null){
+    public void deleteUserById(Long userId) {
+        if (userId == null) {
             throw new NotFoundException("User not found");
         }
         log.info("Delete user with id {}", userId);
         userServiceImp.deleteUserById(userId);
         log.info("Delete suggest");
+    }
+
+    public PostDtoResponse createPost(PostDto postDto) {
+        log.info("Create post :{}", postDto);
+        Post post = new Post();
+        post.setUserId(postDto.getUserId());
+        post.setText(postDto.getText());
+        post.setLikes(0L);
+        post.setTimePost(new Date());
+        Post savedPost = postRepository.save(post);
+        log.info("Saved new post {}", savedPost);
+        return PostDtoResponse.builder().timePost(savedPost.getTimePost()).id(savedPost.getId()).likes(savedPost.getLikes()).text(savedPost.getText()).userId(savedPost.getUserId()).build();
+    }
+
+    public PostDtoResponse addLike(Long postId){
+        log.info("Add like in post :{}", postId);
+        Post post = postRepository.findById(postId).orElseThrow(()-> new NotFoundException("Post not found"));
+        post.setLikes(post.getLikes()+1);
+        Post savedPost = postRepository.save(post);
+        log.info("Post add like");
+        return PostDtoResponse.builder().timePost(savedPost.getTimePost()).id(savedPost.getId()).likes(savedPost.getLikes()).text(savedPost.getText()).userId(savedPost.getUserId()).build();
+    }
+
+    public List<News> getNews(Long id, Long skip, Long limit){
+        log.info("Get news by user {}", id);
+        return userServiceImp.getNews(id, skip, limit);
     }
 }

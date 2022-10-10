@@ -1,7 +1,6 @@
 package com.example.vk.Entity;
 
 
-import com.example.vk.DTO.MessageDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,12 +20,19 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Long userId;
 
     @ManyToOne
-    @JoinColumn(name = "dialog_id")
+    @JoinColumn(name = "user_id",  insertable = false, updatable = false)
+    private User user;
+
+
+    @Column(name ="dialog_id")
+    private Long dialogId;
+
+    @ManyToOne
+    @JoinColumn(name = "dialog_id",  insertable = false, updatable = false)
     private Dialog dialog;
 
     @JsonFormat(pattern = "yyyy-mm-dd hh:mm")

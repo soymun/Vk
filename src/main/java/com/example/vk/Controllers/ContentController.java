@@ -1,8 +1,9 @@
 package com.example.vk.Controllers;
 
 
-import com.example.vk.DTO.FromToUser;
-import com.example.vk.DTO.UserDTO;
+import com.example.vk.DTO.PostDto;
+import com.example.vk.DTO.follow.FromToUser;
+import com.example.vk.DTO.profileDto.UserDTO;
 import com.example.vk.Facade.UserFacade;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,25 +29,30 @@ public class ContentController {
 
     @GetMapping("/profile/{id}")
     public ResponseEntity<?> getProfile(@PathVariable("id") Long id){
-        log.info("");
+        log.info("Get user with id: {}", id);
         return ResponseEntity.ok(userFacade.getUser(id));
     }
     @PutMapping("/profile/{id}")
     public ResponseEntity<?> updateProfile(@PathVariable("id") Long id,@RequestBody UserDTO userDTO){
-        log.info("");
+        log.info("Update user with id:{} and userDto: {}", id, userDTO);
         return ResponseEntity.ok(userFacade.updateProfile(id, userDTO));
     }
     @GetMapping("/users")
     public ResponseEntity<?> getUsers(@RequestBody FromToUser fromToUser){
-        log.info("");
-        List<UserDTO> userDTOS = userFacade.getUserInRadius(fromToUser.getFrom(), fromToUser.getTo());
+        log.info("Get user with radius");
+        List<UserDTO> userDTOS = userFacade.getUserInRadius(fromToUser.getUserId(), fromToUser.getFrom(), fromToUser.getTo());
         return ResponseEntity.ok(userDTOS);
     }
 
     @DeleteMapping("/user/delete/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") Long id){
-        log.info("");
+        log.info("Delete user");
         userFacade.deleteUserById(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/user/post")
+    public ResponseEntity<?> createPost(@RequestBody PostDto postDto){
+        return ResponseEntity.ok(userFacade.createPost(postDto));
     }
 }

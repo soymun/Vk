@@ -1,10 +1,11 @@
 package com.example.vk.Controllers;
 
 
-import com.example.vk.DTO.UserDTO;
-import com.example.vk.Entity.Follow;
-import com.example.vk.Repositories.FollowRepository;
-import com.example.vk.Service.Implaye.UserServiceImp;
+import com.example.vk.DTO.follow.FollowDto;
+import com.example.vk.DTO.follow.UserListDto;
+import com.example.vk.Facade.FollowFacade;
+import com.example.vk.exception.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,26 +13,39 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/vk")
+@Slf4j
+@CrossOrigin(origins="http://localhost:3000")
 public class FollowUserController {
 
+    private final FollowFacade followFacade;
+
+
     @Autowired
-    private UserServiceImp userServiceImp;
-    private FollowRepository followRepository;
+    public FollowUserController(FollowFacade findFollowById) {
+        this.followFacade = findFollowById;
+    }
 
     @GetMapping("/feed/{id}")
-    public List<UserDTO> getFollow(@PathVariable Long id){
-        return userServiceImp.getFollow(id);
+    public List<UserListDto> getFollow(@PathVariable Long id){
+        if (id == null){
+            throw new NotFoundException("Id is null");
+        }
+        log.info("Get follow");
+        return followFacade.getFollowUser(id);
     }
 
-    @PostMapping("/feed/{id}")
-    public void setUser(@RequestBody Long userTwo, @PathVariable Long id){
-        Follow follow = new Follow(id, userTwo);
-        followRepository.save(follow);
+    @PostMapping("/feed")
+    public void setUser(@RequestBody FollowDto followDto){
+        if (followDto == null){
+            throw new NotFoundException("Don't save follow");
+        }
+        log.info("Follow user");
+        followFacade.saveFollow(followDto);
     }
 
-    @DeleteMapping("/feed")
-    public void unFollow(@RequestBody Long followId){
-        Follow follow = followRepository.findFollowById(followId);
-        followRepository.delete(follow);
+    @DeleteMapping("/feed/{id}")
+    public void unFollow(@PathVariable Long id){
+        log.info("Unfollow user");
+        followFacade.unFollow(id);
     }
 }

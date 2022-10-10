@@ -1,8 +1,6 @@
 package com.example.vk.Service;
 
-import com.example.vk.DTO.UserDTO;
-import com.example.vk.Entity.Dialog;
-import com.example.vk.Entity.Post;
+import com.example.vk.DTO.follow.UserListDto;
 import com.example.vk.Entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,7 +29,7 @@ public interface UserService extends UserDetailsService {
     User updateUser(User updateUser);
 
     @Transactional
-    List<User> getUserInRadius(Long from, Long to);
+    List<UserListDto> getUserInRadius(Long userId,Long from, Long to);
 
     @Transactional
     void deleteUserById(Long id);

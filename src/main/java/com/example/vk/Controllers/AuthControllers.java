@@ -1,10 +1,10 @@
 package com.example.vk.Controllers;
 
-import com.example.vk.DTO.AuthDTO;
-import com.example.vk.DTO.RegDTO;
-import com.example.vk.Exeption.NotFoundException;
+import com.example.vk.DTO.authDto.AuthDTO;
+import com.example.vk.DTO.authDto.RegDTO;
 import com.example.vk.Facade.AuthFacade;
 import com.example.vk.Response.RegistrationResponse;
+import com.example.vk.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

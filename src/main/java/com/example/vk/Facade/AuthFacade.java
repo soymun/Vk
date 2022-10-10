@@ -1,15 +1,15 @@
 package com.example.vk.Facade;
 
 
-import com.example.vk.DTO.AuthDTO;
-import com.example.vk.DTO.RegDTO;
+import com.example.vk.DTO.authDto.AuthDTO;
+import com.example.vk.DTO.authDto.RegDTO;
 import com.example.vk.Entity.Role;
 import com.example.vk.Entity.User;
-import com.example.vk.Exeption.NotFoundException;
 import com.example.vk.Response.RegistrationResponse;
 import com.example.vk.Security.JWTAuthException;
 import com.example.vk.Security.JWTTokenProvider;
 import com.example.vk.Service.Implaye.UserServiceImp;
+import com.example.vk.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

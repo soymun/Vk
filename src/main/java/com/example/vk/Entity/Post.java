@@ -20,8 +20,11 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "user_id")
+    private Long userId;
+
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",  insertable = false, updatable = false)
     private User user;
 
     @JsonFormat(pattern = "yyyy-mm-dd hh:mm")

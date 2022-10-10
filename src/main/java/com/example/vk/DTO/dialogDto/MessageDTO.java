@@ -1,9 +1,11 @@
-package com.example.vk.DTO;
+package com.example.vk.DTO.dialogDto;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class MessageDTO {
 
     private Long dialogId;

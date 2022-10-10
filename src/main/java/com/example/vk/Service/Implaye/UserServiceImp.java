@@ -1,20 +1,21 @@
 package com.example.vk.Service.Implaye;
 
-import com.example.vk.DTO.UserDTO;
+import com.example.vk.DTO.follow.UserListDto;
+import com.example.vk.DTO.dialogDto.UserMessageDto;
+import com.example.vk.DTO.newsDto.News;
 import com.example.vk.Entity.*;
-import com.example.vk.Exeption.NotFoundException;
 import com.example.vk.Repositories.UserRepository;
 import com.example.vk.Service.UserService;
+import com.example.vk.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.*;
 import java.util.List;
 
 
@@ -28,11 +29,10 @@ public class UserServiceImp implements UserService {
 
     private final UserRepository userRepository;
 
-    private final PasswordEncoder passwordEncoder;
     @Autowired
-    public UserServiceImp(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImp(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+
     }
 
     @Override
@@ -41,6 +41,9 @@ public class UserServiceImp implements UserService {
             throw new IllegalArgumentException("Email is null");
         }
         User user = getUserByUsername(username);
+        if(user == null){
+            throw new NotFoundException(String.format("User with email %s not found", username));
+        }
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), user.getRole().getAuthority());
     }
 
@@ -54,7 +57,7 @@ public class UserServiceImp implements UserService {
         return userRepository.findUserById(id);
     }
 
-    @Transactional
+
     @Override
     public void save(User user){
         userRepository.save(user);
@@ -79,7 +82,7 @@ public class UserServiceImp implements UserService {
                 user.setAbout(updateUser.getAbout());
             }
             if(updateUser.getPassword() != null){
-                user.setPassword(passwordEncoder.encode(updateUser.getEmail()));
+                user.setPassword(updateUser.getEmail());
             }
             if(updateUser.getName() != null){
                 user.setName(updateUser.getName());
@@ -93,20 +96,84 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public List<User> getUserInRadius(Long from, Long to) {
-        return null;
+    public List<UserListDto> getUserInRadius(Long userId, Long from, Long to) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<UserListDto> cq = cb.createQuery(UserListDto.class);
+        Root<User> root = cq.from(User.class);
+        cq.where(cb.not(cb.equal(root.get(User_.ID), userId)));
+        cq.multiselect(
+                root.get(User_.id),
+                root.get(User_.name),
+                root.get(User_.surname),
+                root.get(User_.about)
+        );
+        return entityManager.createQuery(cq).setFirstResult(from.intValue()).setMaxResults(to.intValue()).getResultList();
     }
 
     @Override
     public void deleteUserById(Long id) {
-
+        userRepository.deleteById(id);
     }
 
-    public List<UserDTO> getFollow(Long id){
-        return null;
+    public List<UserListDto> getFollow(Long id){
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<UserListDto> cq = cb.createQuery(UserListDto.class);
+        Root<User> root = cq.from(User.class);
+
+        Subquery<Long> subquery = cq.subquery(Long.class);
+        Root<Follow> roots = subquery.from(Follow.class);
+        subquery.select(
+                roots.get(Follow_.userTwo)
+        );
+        subquery.where(cb.equal(roots.get(Follow_.userOne), id));
+        cq.where(cb.in(root.get(User_.id)).value(subquery));
+
+        cq.multiselect(
+                root.get(User_.id),
+                root.get(User_.name),
+                root.get(User_.surname),
+                root.get(User_.about)
+        );
+
+        return entityManager.createQuery(cq).getResultList();
     }
 
-    public List<Post> getNews(Long id, Long skip, Long limit){
-        return  null;
+    public List<UserMessageDto> getUserByDialogId(Long dialogId){
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<UserMessageDto> cq = cb.createQuery(UserMessageDto.class);
+        Root<UserDialog> root = cq.from(UserDialog.class);
+
+        Join<UserDialog, User> join = root.join(UserDialog_.USER);
+
+        cq.where(cb.equal(root.get(UserDialog_.DIALOG_ID), dialogId));
+
+        cq.multiselect(
+                join.get(User_.id),
+                join.get(User_.NAME),
+                join.get(User_.surname)
+        );
+        return entityManager.createQuery(cq).getResultList();
+    }
+
+    public List<News> getNews(Long id, Long skip, Long limit){
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<News> cq = cb.createQuery(News.class);
+        Root<Post> root = cq.from(Post.class);
+        Join<Post, User> join = root.join(Post_.USER);
+        Subquery<Long> subquery = cq.subquery(Long.class);
+        Root<Follow> roots = subquery.from(Follow.class);
+        subquery.where(cb.equal(roots.get(Follow_.USER_ONE), id));
+        subquery.select(
+                roots.get(Follow_.USER_TWO)
+        );
+        cq.where(cb.in(join.get(User_.ID)).value(subquery));
+        cq.multiselect(
+            root.get(Post_.ID),
+                root.get(Post_.USER_ID),
+                root.get(Post_.TIME_POST),
+                root.get(Post_.TEXT),
+                root.get(Post_.LIKES)
+        );
+        return entityManager.createQuery(cq).setFirstResult(skip.intValue()).setMaxResults(limit.intValue()).getResultList();
     }
 }

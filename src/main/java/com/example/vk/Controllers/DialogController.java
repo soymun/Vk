@@ -1,63 +1,57 @@
 package com.example.vk.Controllers;
 
 
-import com.example.vk.Controllers.Funchional.UserF;
-import com.example.vk.DTO.DialogsDTO;
-import com.example.vk.DTO.MessageDTO;
-import com.example.vk.Response.DialogDTOResponse;
-import com.example.vk.Entity.Dialog;
-import com.example.vk.Entity.User;
-import com.example.vk.Service.Implaye.DialogsServiceImp;
-import com.example.vk.Service.Implaye.UserServiceImp;
+import com.example.vk.DTO.dialogDto.CreateDialogDto;
+import com.example.vk.DTO.dialogDto.DialogsDTO;
+import com.example.vk.DTO.dialogDto.MessageDTO;
+import com.example.vk.DTO.dialogDto.MessageResponseDto;
+import com.example.vk.Facade.DialogFacade;
+import com.example.vk.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Controller
 @RequestMapping("/vk")
 @Slf4j
+@CrossOrigin(origins="http://localhost:3000")
 public class DialogController {
 
-    private final UserServiceImp userServiceImp;
-    private final DialogsServiceImp dialogsServiceImp;
+    private final DialogFacade dialogFacade;
+
     @Autowired
-    public DialogController(UserServiceImp userServiceImp, DialogsServiceImp dialogsServiceImp) {
-        this.userServiceImp = userServiceImp;
-        this.dialogsServiceImp = dialogsServiceImp;
+    public DialogController(DialogFacade dialogFacade) {
+        this.dialogFacade = dialogFacade;
     }
 
-    @GetMapping("/dialogs/{id}")
-    public ResponseEntity<List<DialogDTOResponse>> getDialogs(@PathVariable("id") Long id){
+    @GetMapping("/dialogs/user/{id}")
+    public ResponseEntity<?> getDialogs(@PathVariable("id") Long id){
         if(id == null){
-            throw new RuntimeException("Id is null");
+            throw new NotFoundException("Id is null");
         }
-        User user = userServiceImp.getUserById(id);
-        List<DialogDTOResponse> dialogDTOResponses = new ArrayList<>();
-        user.getDialogs().stream().forEach(n -> dialogDTOResponses.add(new DialogDTOResponse(n)));
-        return ResponseEntity.ok(dialogDTOResponses);
+        log.info("Get dialog");
+        return ResponseEntity.ok(dialogFacade.getAllDialogByUserId(id));
     }
 
-    @PostMapping("/dialogs/{id}")
-    public ResponseEntity<?> addDialogs(@PathVariable("id") Long id, @RequestBody DialogsDTO dialogsDTO){
-        User userOne = userServiceImp.getUserById(id);
-        User userTwo = userServiceImp.getUserById(dialogsDTO.getUserId());
-        Dialog dialog = UserF.saveDialog(userOne, userTwo);
-        dialogsServiceImp.save(dialog);
-        userServiceImp.save(userOne);
-        userServiceImp.save(userTwo);
-        return ResponseEntity.ok("Suggest");
+    @PostMapping("/create/dialog")
+    public ResponseEntity<?> addDialogs(@RequestBody CreateDialogDto createDialogDto){
+        log.info("Create dialog");
+        DialogsDTO dialogsDTO = dialogFacade.createDialog(createDialogDto.getUserOne(), createDialogDto.getUserTwo(), createDialogDto.getName());
+        return ResponseEntity.ok(dialogsDTO);
     }
 
     @PostMapping("/message")
     public ResponseEntity<?> addMessage(@RequestBody MessageDTO messageDTO){
-//        Dialog dialog = dialogsServiceImp.findDialogById(messageDTO.getDialogId());
-//        dialog.addMessage(new Message(messageDTO));
-//        dialogsServiceImp.save(dialog);
-        return ResponseEntity.ok("Suggest");
+        log.info("Save message");
+        MessageResponseDto message = dialogFacade.saveMessage(messageDTO);
+        return ResponseEntity.ok(message);
+    }
+
+    @GetMapping("/dialog/{id}")
+    public ResponseEntity<?> getDialog(@PathVariable("id") Long id){
+        log.info("Get dialog");
+        return ResponseEntity.ok(dialogFacade.getDialog(id));
     }
 }
