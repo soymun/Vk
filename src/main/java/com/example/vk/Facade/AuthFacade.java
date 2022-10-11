@@ -75,7 +75,7 @@ public class AuthFacade {
             log.info("Token created");
             Map<Object, Object> response = new HashMap<>();
             response.put("id", user.getId());
-            response.put("name", user.getName());
+            response.put("email", user.getEmail());
             response.put("token", token);
             return ResponseEntity.ok(response);
         }catch (Exception e){
