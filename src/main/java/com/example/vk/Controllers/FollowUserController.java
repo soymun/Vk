@@ -7,6 +7,7 @@ import com.example.vk.Facade.FollowFacade;
 import com.example.vk.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class FollowUserController {
     }
 
     @GetMapping("/feed/{id}")
+    @PreAuthorize(value = "hasAuthority('USER')")
     public List<UserListDto> getFollow(@PathVariable Long id){
         if (id == null){
             throw new NotFoundException("Id is null");
@@ -35,6 +37,7 @@ public class FollowUserController {
     }
 
     @PostMapping("/feed")
+    @PreAuthorize(value = "hasAuthority('USER')")
     public void setUser(@RequestBody FollowDto followDto){
         if (followDto == null){
             throw new NotFoundException("Don't save follow");
@@ -44,6 +47,7 @@ public class FollowUserController {
     }
 
     @DeleteMapping("/feed/{id}")
+    @PreAuthorize(value = "hasAuthority('USER')")
     public void unFollow(@PathVariable Long id){
         log.info("Unfollow user");
         followFacade.unFollow(id);

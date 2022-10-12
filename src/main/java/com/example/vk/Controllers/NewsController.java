@@ -7,6 +7,7 @@ import com.example.vk.Response.PostDtoResponse;
 import com.example.vk.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class NewsController {
     }
 
     @GetMapping("/news/{id}")
+    @PreAuthorize(value = "hasAuthority('USER')")
     public List<News> getNews(@PathVariable Long id, @RequestParam("skip") Long skip, @RequestParam("limit") Long limit){
         if (id == null){
             throw new NotFoundException("Don't found news");
@@ -34,6 +36,7 @@ public class NewsController {
     }
 
     @PostMapping("/post/{id}")
+    @PreAuthorize(value = "hasAuthority('USER')")
     public PostDtoResponse addLike(@PathVariable("id") Long id){
         if(id == null){
             throw new NotFoundException("Don't found post");
