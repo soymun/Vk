@@ -1,16 +1,13 @@
 package com.example.vk.Controllers;
 
 
-import com.example.vk.DTO.newsDto.News;
 import com.example.vk.Facade.UserFacade;
-import com.example.vk.Response.PostDtoResponse;
 import com.example.vk.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin(origins="http://localhost:3000")
@@ -27,7 +24,7 @@ public class NewsController {
 
     @GetMapping("/news/{id}")
     @PreAuthorize(value = "hasAuthority('USER')")
-    public List<News> getNews(@PathVariable Long id, @RequestParam("page") Long page){
+    public ResponseEntity<?> getNews(@PathVariable Long id, @RequestParam("page") Long page){
         if (id == null){
             throw new NotFoundException("Don't found news");
         }
@@ -35,13 +32,23 @@ public class NewsController {
         return userFacade.getNews(id, page);
     }
 
-    @PostMapping("/post/{id}")
+    @PatchMapping("/post/like/{id}")
     @PreAuthorize(value = "hasAuthority('USER')")
-    public PostDtoResponse addLike(@PathVariable("id") Long id){
+    public ResponseEntity<?> addLike(@PathVariable("id") Long id){
         if(id == null){
             throw new NotFoundException("Don't found post");
         }
         log.info("Add like");
         return userFacade.addLike(id);
+    }
+
+    @PatchMapping("/post/dislike/{id}")
+    @PreAuthorize(value = "hasAuthority('USER')")
+    public ResponseEntity<?> addDislike(@PathVariable("id") Long id){
+        if(id == null){
+            throw new NotFoundException("Don't found post");
+        }
+        log.info("Add dislike");
+        return userFacade.addDislikes(id);
     }
 }

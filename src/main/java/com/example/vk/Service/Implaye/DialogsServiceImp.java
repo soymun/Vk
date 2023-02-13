@@ -78,7 +78,7 @@ public class DialogsServiceImp implements DialogsService {
         userDialogTwo.setDialogId(saveDialog.getId());
         userDialogRepository.save(userDialogTwo);
 
-        return new AllDialogGetDto(saveDialog.getId(), name);
+        return null;
     }
 
     //add create group dialog

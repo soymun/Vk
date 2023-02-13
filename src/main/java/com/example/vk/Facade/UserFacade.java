@@ -3,22 +3,19 @@ package com.example.vk.Facade;
 
 import com.example.vk.DTO.PostDto;
 import com.example.vk.DTO.follow.FromToUser;
-import com.example.vk.DTO.newsDto.News;
 import com.example.vk.DTO.profileDto.UserDTO;
 import com.example.vk.Entity.Post;
-import com.example.vk.Entity.User;
 import com.example.vk.Mapper.UserDtoMapper;
 import com.example.vk.Repositories.PostRepository;
-import com.example.vk.Response.PostDtoResponse;
+import com.example.vk.Response.ResponseDto;
 import com.example.vk.Service.Implaye.UserServiceImp;
 import com.example.vk.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -33,36 +30,44 @@ public class UserFacade {
 
     private final PostRepository postRepository;
 
-    public UserDTO getUser(Long id) {
+    public ResponseEntity<?> getUser(Long id) {
         if (id == null) {
             throw new NotFoundException(String.format("User with id:%s not found", id));
         }
-        UserDTO user = userServiceImp.getUserById(id);
-        if (user == null) {
+        UserDTO userDTO = userServiceImp.getUserById(id);
+        if (userDTO == null) {
             throw new NotFoundException(String.format("User with id:%s not found", id));
         }
         log.info("User found with id:{}", id);
-//        UserDTO userDTO = userDtoMapper.userToUserDTO(user);
-//        userDTO.setPosts(postRepository.getPostByUserId(userDTO.getId()).stream().map(userDtoMapper::postToUserPostDto).collect(Collectors.toList()));
-        return null;
+        userDTO.setPosts(postRepository.getPostByUserId(userDTO.getId()).stream().map(userDtoMapper::postToUserPostDto).collect(Collectors.toList()));
+        return ResponseEntity.ok(ResponseDto.builder().data(userDTO).build());
     }
 
-    public UserDTO updateProfile(Long id, UserDTO userDTO) {
+    public ResponseEntity<?> updateProfile(Long id, UserDTO userDTO) {
         if (id == null || userDTO == null) {
             throw new NotFoundException(String.format("User with id:%s not found", id));
         }
         userDTO.setId(id);
         UserDTO user = userServiceImp.updateUser(userDTO);
         log.info("User update :{}", user);
-        return user;
+        return ResponseEntity.ok(ResponseDto.builder().data(user).build());
     }
 
-    public List<UserDTO> getUserInRadius(FromToUser fromToUser) {
+    public ResponseEntity<?> getUserInRadius(FromToUser fromToUser) {
         if (fromToUser == null) {
             throw new NotFoundException("Users not found");
         }
 
-        return userServiceImp.getUserInRadius(fromToUser).stream().filter(Objects::nonNull).map(userDtoMapper::userListDtoToUserDTO).peek(n -> log.info("In radius user {}", n)).collect(Collectors.toList());
+        log.info("Get users");
+
+        return ResponseEntity
+                .ok(ResponseDto.builder()
+                        .data(userServiceImp.getUserInRadius(fromToUser)
+                                .stream()
+                                .filter(Objects::nonNull)
+                                .map(userDtoMapper::userListDtoToUserDTO)
+                                .collect(Collectors.toList()))
+                        .build());
 
     }
 
@@ -75,29 +80,39 @@ public class UserFacade {
         log.info("Delete suggest");
     }
 
-    public PostDtoResponse createPost(PostDto postDto) {
+    public ResponseEntity<?> createPost(PostDto postDto) {
         log.info("Create post :{}", postDto);
         Post post = new Post();
         post.setUserId(postDto.getUserId());
         post.setText(postDto.getText());
         post.setLikes(0L);
+        post.setDisLikes(0L);
         post.setTimePost(LocalDate.now());
         Post savedPost = postRepository.save(post);
         log.info("Saved new post {}", savedPost);
-        return PostDtoResponse.builder().timePost(savedPost.getTimePost()).id(savedPost.getId()).likes(savedPost.getLikes()).text(savedPost.getText()).userId(savedPost.getUserId()).build();
+        return ResponseEntity.ok(ResponseDto.builder().data(post).build());
     }
 
-    public PostDtoResponse addLike(Long postId){
+    public ResponseEntity<?> addLike(Long postId){
         log.info("Add like in post :{}", postId);
         Post post = postRepository.findById(postId).orElseThrow(()-> new NotFoundException("Post not found"));
         post.setLikes(post.getLikes()+1);
         Post savedPost = postRepository.save(post);
         log.info("Post add like");
-        return PostDtoResponse.builder().timePost(savedPost.getTimePost()).id(savedPost.getId()).likes(savedPost.getLikes()).text(savedPost.getText()).userId(savedPost.getUserId()).build();
+        return ResponseEntity.ok(ResponseDto.builder().data(savedPost).build());
     }
 
-    public List<News> getNews(Long id, Long page){
+    public ResponseEntity<?> addDislikes(Long postId){
+        log.info("Add dislikes in post :{}", postId);
+        Post post = postRepository.findById(postId).orElseThrow(()-> new NotFoundException("Post not found"));
+        post.setDisLikes(post.getDisLikes()+1);
+        Post savedPost = postRepository.save(post);
+        log.info("Post add dislike");
+        return ResponseEntity.ok(ResponseDto.builder().data(savedPost).build());
+    }
+
+    public ResponseEntity<?> getNews(Long id, Long page){
         log.info("Get news by user {}", id);
-        return userServiceImp.getNews(id, page);
+        return ResponseEntity.ok(ResponseDto.builder().data(userServiceImp.getNews(id, page)).build());
     }
 }

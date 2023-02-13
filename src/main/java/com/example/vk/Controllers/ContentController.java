@@ -32,20 +32,19 @@ public class ContentController {
     @PreAuthorize(value = "hasAuthority('USER')")
     public ResponseEntity<?> getProfile(@PathVariable("id") Long id){
         log.info("Get user with id: {}", id);
-        return ResponseEntity.ok(userFacade.getUser(id));
+        return userFacade.getUser(id);
     }
     @PutMapping("/profile/{id}")
     @PreAuthorize(value = "hasAuthority('USER')")
     public ResponseEntity<?> updateProfile(@PathVariable("id") Long id,@RequestBody UserDTO userDTO){
         log.info("Update user with id:{} and userDto: {}", id, userDTO);
-        return ResponseEntity.ok(userFacade.updateProfile(id, userDTO));
+        return userFacade.updateProfile(id, userDTO);
     }
     @GetMapping("/users")
     @PreAuthorize(value = "hasAuthority('USER')")
     public ResponseEntity<?> getUsers(@RequestBody FromToUser fromToUser){
         log.info("Get user with radius");
-        List<UserDTO> userDTOS = userFacade.getUserInRadius(fromToUser);
-        return ResponseEntity.ok(userDTOS);
+        return userFacade.getUserInRadius(fromToUser);
     }
 
     @DeleteMapping("/user/delete/{id}")
@@ -53,12 +52,12 @@ public class ContentController {
     public ResponseEntity<?> deleteUser(@PathVariable("id") Long id){
         log.info("Delete user");
         userFacade.deleteUserById(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/user/post")
     @PreAuthorize(value = "hasAuthority('USER')")
     public ResponseEntity<?> createPost(@RequestBody PostDto postDto){
-        return ResponseEntity.ok(userFacade.createPost(postDto));
+        return userFacade.createPost(postDto);
     }
 }
