@@ -23,13 +23,17 @@ public class Dialog {
 
     private String dialogName;
 
-    @ManyToMany(mappedBy = "dialogs", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    private List<User> userLis= new ArrayList<>();
+    private TypeDialog typeDialog;
 
-    @OneToMany(mappedBy = "dialog",cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_admin_id", insertable = false, updatable = false)
     @ToString.Exclude
-    private List<Message> messages = new ArrayList<>();
+    private User user;
+
+    @Column(name = "user_admin_id")
+    private Long userAdminId;
+
+    private String urlToDialogAvatar;
 
     @Override
     public boolean equals(Object o) {

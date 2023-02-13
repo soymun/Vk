@@ -23,9 +23,6 @@ public interface UserService extends UserDetailsService {
     void save(User user);
 
     @Transactional
-    List<User> findAll();
-
-    @Transactional
     User updateUser(User updateUser);
 
     @Transactional

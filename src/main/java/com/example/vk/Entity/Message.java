@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -23,7 +24,7 @@ public class Message {
     @Column(name = "user_id")
     private Long userId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",  insertable = false, updatable = false)
     private User user;
 
@@ -31,12 +32,12 @@ public class Message {
     @Column(name ="dialog_id")
     private Long dialogId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dialog_id",  insertable = false, updatable = false)
     private Dialog dialog;
 
     @JsonFormat(pattern = "yyyy-mm-dd hh:mm")
-    private Date timePost;
+    private LocalDate timePost;
 
     private String text;
 }

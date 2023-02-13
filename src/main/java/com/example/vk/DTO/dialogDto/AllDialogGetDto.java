@@ -10,4 +10,6 @@ public class AllDialogGetDto {
     private Long id;
 
     private String name;
+
+    private MessageDTO lastMessage;
 }

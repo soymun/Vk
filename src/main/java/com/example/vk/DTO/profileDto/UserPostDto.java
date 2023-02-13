@@ -14,4 +14,8 @@ public class UserPostDto {
     private Date timePost;
 
     private String text;
+
+    private Long likes;
+
+    private Long disLikes;
 }

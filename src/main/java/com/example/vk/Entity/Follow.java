@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Data
@@ -20,8 +17,18 @@ public class Follow {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_one", insertable = false, updatable = false)
+    private User userLinkOne;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_two", insertable = false, updatable = false)
+    private User userLinkTwo;
+
+    @Column(name = "user_one")
     private Long userOne;
 
+    @Column(name = "user_two")
     private Long userTwo;
 
     public Follow(Long userOne, Long userTwo) {

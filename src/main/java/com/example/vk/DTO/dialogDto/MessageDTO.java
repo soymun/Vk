@@ -8,6 +8,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class MessageDTO {
 
+    private Long id;
+
     private Long dialogId;
 
     private Long userId;

@@ -27,12 +27,12 @@ public class NewsController {
 
     @GetMapping("/news/{id}")
     @PreAuthorize(value = "hasAuthority('USER')")
-    public List<News> getNews(@PathVariable Long id, @RequestParam("skip") Long skip, @RequestParam("limit") Long limit){
+    public List<News> getNews(@PathVariable Long id, @RequestParam("page") Long page){
         if (id == null){
             throw new NotFoundException("Don't found news");
         }
         log.info("Get news");
-        return userFacade.getNews(id, skip, limit);
+        return userFacade.getNews(id, page);
     }
 
     @PostMapping("/post/{id}")

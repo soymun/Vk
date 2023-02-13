@@ -3,6 +3,7 @@ package com.example.vk.Response;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Builder
@@ -13,7 +14,7 @@ public class PostDtoResponse {
 
     private Long userId;
 
-    private Date timePost;
+    private LocalDate timePost;
 
     private String text;
 

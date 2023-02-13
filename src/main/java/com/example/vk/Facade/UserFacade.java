@@ -11,10 +11,11 @@ import com.example.vk.Repositories.PostRepository;
 import com.example.vk.Response.PostDtoResponse;
 import com.example.vk.Service.Implaye.UserServiceImp;
 import com.example.vk.exception.NotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class UserFacade {
 
     private final UserServiceImp userServiceImp;
@@ -29,13 +31,6 @@ public class UserFacade {
     private final UserDtoMapper userDtoMapper;
 
     private final PostRepository postRepository;
-
-    @Autowired
-    public UserFacade(UserServiceImp userServiceImp, UserDtoMapper userDtoMapper, PostRepository postRepository) {
-        this.userServiceImp = userServiceImp;
-        this.userDtoMapper = userDtoMapper;
-        this.postRepository = postRepository;
-    }
 
     public UserDTO getUser(Long id) {
         if (id == null) {
@@ -47,7 +42,7 @@ public class UserFacade {
         }
         log.info("User found with id:{}", id);
         UserDTO userDTO = userDtoMapper.userToUserDTO(user);
-        userDTO.setPosts(user.getPosts().stream().map(userDtoMapper::postToUserPostDto).collect(Collectors.toList()));
+        userDTO.setPosts(postRepository.getPostByUserId(userDTO.getId()).stream().map(userDtoMapper::postToUserPostDto).collect(Collectors.toList()));
         return userDTO;
     }
 
@@ -86,7 +81,7 @@ public class UserFacade {
         post.setUserId(postDto.getUserId());
         post.setText(postDto.getText());
         post.setLikes(0L);
-        post.setTimePost(new Date());
+        post.setTimePost(LocalDate.now());
         Post savedPost = postRepository.save(post);
         log.info("Saved new post {}", savedPost);
         return PostDtoResponse.builder().timePost(savedPost.getTimePost()).id(savedPost.getId()).likes(savedPost.getLikes()).text(savedPost.getText()).userId(savedPost.getUserId()).build();
@@ -101,8 +96,8 @@ public class UserFacade {
         return PostDtoResponse.builder().timePost(savedPost.getTimePost()).id(savedPost.getId()).likes(savedPost.getLikes()).text(savedPost.getText()).userId(savedPost.getUserId()).build();
     }
 
-    public List<News> getNews(Long id, Long skip, Long limit){
+    public List<News> getNews(Long id, Long page){
         log.info("Get news by user {}", id);
-        return userServiceImp.getNews(id, skip, limit);
+        return userServiceImp.getNews(id, page);
     }
 }

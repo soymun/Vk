@@ -2,6 +2,8 @@ package com.example.vk.Service.Implaye;
 
 import com.example.vk.DTO.dialogDto.AllDialogGetDto;
 import com.example.vk.Entity.*;
+import com.example.vk.Entity.Dialog_;
+import com.example.vk.Entity.UserDialog_;
 import com.example.vk.Repositories.DialogsRepository;
 import com.example.vk.Repositories.UserDialogRepository;
 import com.example.vk.Service.DialogsService;
@@ -50,6 +52,8 @@ public class DialogsServiceImp implements DialogsService {
         Root<UserDialog> root = cq.from(UserDialog.class);
         Join<UserDialog, Dialog> join = root.join(UserDialog_.dialog);
 
+        //add last message, count no read message
+
         cq.where(cb.equal(root.get(UserDialog_.USER_ID), id));
 
         cq.multiselect(
@@ -76,4 +80,7 @@ public class DialogsServiceImp implements DialogsService {
 
         return new AllDialogGetDto(saveDialog.getId(), name);
     }
+
+    //add create group dialog
+
 }

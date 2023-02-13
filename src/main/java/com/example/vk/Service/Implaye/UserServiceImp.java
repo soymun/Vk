@@ -4,9 +4,16 @@ import com.example.vk.DTO.follow.UserListDto;
 import com.example.vk.DTO.dialogDto.UserMessageDto;
 import com.example.vk.DTO.newsDto.News;
 import com.example.vk.Entity.*;
+import com.example.vk.Entity.Follow_;
+import com.example.vk.Entity.Post_;
+import com.example.vk.Entity.UserDialog_;
+import com.example.vk.Entity.User_;
+import com.example.vk.Mapper.UserDtoMapper;
+import com.example.vk.Repositories.PostRepository;
 import com.example.vk.Repositories.UserRepository;
 import com.example.vk.Service.UserService;
 import com.example.vk.exception.NotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +28,7 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserServiceImp implements UserService {
 
 
@@ -29,11 +37,7 @@ public class UserServiceImp implements UserService {
 
     private final UserRepository userRepository;
 
-    @Autowired
-    public UserServiceImp(UserRepository userRepository) {
-        this.userRepository = userRepository;
-
-    }
+    private final UserDtoMapper userDtoMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -61,11 +65,6 @@ public class UserServiceImp implements UserService {
     @Override
     public void save(User user){
         userRepository.save(user);
-    }
-
-    @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
     }
 
     @Override
@@ -155,7 +154,7 @@ public class UserServiceImp implements UserService {
         return entityManager.createQuery(cq).getResultList();
     }
 
-    public List<News> getNews(Long id, Long skip, Long limit){
+    public List<News> getNews(Long id, Long page){
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<News> cq = cb.createQuery(News.class);
         Root<Post> root = cq.from(Post.class);
@@ -174,6 +173,9 @@ public class UserServiceImp implements UserService {
                 root.get(Post_.TEXT),
                 root.get(Post_.LIKES)
         );
-        return entityManager.createQuery(cq).setFirstResult(skip.intValue()).setMaxResults(limit.intValue()).getResultList();
+        return entityManager.createQuery(cq)
+                .setFirstResult((page.intValue()-1)*100)
+                .setMaxResults(page.intValue()*100)
+                .getResultList();
     }
 }

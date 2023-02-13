@@ -15,7 +15,7 @@ public class UserDialog {
     @Column(name = "user_id")
     private Long userId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id",  insertable = false, updatable = false)
     private User user;
 
@@ -23,7 +23,7 @@ public class UserDialog {
     @Column(name = "dialog_id")
     private Long dialogId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dialog_id", referencedColumnName = "id",  insertable = false, updatable = false)
     private Dialog dialog;
 }
