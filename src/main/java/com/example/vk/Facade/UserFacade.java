@@ -2,6 +2,7 @@ package com.example.vk.Facade;
 
 
 import com.example.vk.DTO.PostDto;
+import com.example.vk.DTO.follow.FromToUser;
 import com.example.vk.DTO.newsDto.News;
 import com.example.vk.DTO.profileDto.UserDTO;
 import com.example.vk.Entity.Post;
@@ -36,14 +37,14 @@ public class UserFacade {
         if (id == null) {
             throw new NotFoundException(String.format("User with id:%s not found", id));
         }
-        User user = userServiceImp.getUserById(id);
+        UserDTO user = userServiceImp.getUserById(id);
         if (user == null) {
             throw new NotFoundException(String.format("User with id:%s not found", id));
         }
         log.info("User found with id:{}", id);
-        UserDTO userDTO = userDtoMapper.userToUserDTO(user);
-        userDTO.setPosts(postRepository.getPostByUserId(userDTO.getId()).stream().map(userDtoMapper::postToUserPostDto).collect(Collectors.toList()));
-        return userDTO;
+//        UserDTO userDTO = userDtoMapper.userToUserDTO(user);
+//        userDTO.setPosts(postRepository.getPostByUserId(userDTO.getId()).stream().map(userDtoMapper::postToUserPostDto).collect(Collectors.toList()));
+        return null;
     }
 
     public UserDTO updateProfile(Long id, UserDTO userDTO) {
@@ -51,18 +52,17 @@ public class UserFacade {
             throw new NotFoundException(String.format("User with id:%s not found", id));
         }
         userDTO.setId(id);
-        User user = userServiceImp.updateUser(userDtoMapper.userDTOToUser(userDTO));
+        UserDTO user = userServiceImp.updateUser(userDTO);
         log.info("User update :{}", user);
-        return userDtoMapper.userToUserDTO(user);
+        return user;
     }
 
-    public List<UserDTO> getUserInRadius(Long userId, Long from, Long to) {
-        if (from == null || to == null) {
-            throw new NotFoundException("Users in radius not found");
+    public List<UserDTO> getUserInRadius(FromToUser fromToUser) {
+        if (fromToUser == null) {
+            throw new NotFoundException("Users not found");
         }
-        log.info("User get in radius from {} to {}", from, to);
 
-        return userServiceImp.getUserInRadius(userId, from, to).stream().filter(Objects::nonNull).map(userDtoMapper::userListDtoToUserDTO).peek(n -> log.info("In radius user {}", n)).collect(Collectors.toList());
+        return userServiceImp.getUserInRadius(fromToUser).stream().filter(Objects::nonNull).map(userDtoMapper::userListDtoToUserDTO).peek(n -> log.info("In radius user {}", n)).collect(Collectors.toList());
 
     }
 

@@ -3,6 +3,7 @@ package com.example.vk.DTO.newsDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -13,9 +14,11 @@ public class News {
 
     private Long userId;
 
-    private Date tamePost;
+    private LocalDate tamePost;
 
     private String text;
 
     private Long likes;
+
+    private Long disLikes;
 }

@@ -8,7 +8,11 @@ public class FromToUser {
 
     private Long userId;
 
-    private Long from;
+    private Long page;
 
-    private Long to;
+    private String name;
+
+    private String surname;
+
+    private String patronymic;
 }

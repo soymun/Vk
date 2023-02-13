@@ -44,7 +44,7 @@ public class ContentController {
     @PreAuthorize(value = "hasAuthority('USER')")
     public ResponseEntity<?> getUsers(@RequestBody FromToUser fromToUser){
         log.info("Get user with radius");
-        List<UserDTO> userDTOS = userFacade.getUserInRadius(fromToUser.getUserId(), fromToUser.getFrom(), fromToUser.getTo());
+        List<UserDTO> userDTOS = userFacade.getUserInRadius(fromToUser);
         return ResponseEntity.ok(userDTOS);
     }
 
