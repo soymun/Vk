@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/user")
 @CrossOrigin(origins="http://localhost:3000")
-public class ContentController {
+public class UserController {
 
 
     private final UserFacade userFacade;
 
     @Autowired
-    public ContentController(UserFacade userFacade) {
+    public UserController(UserFacade userFacade) {
         this.userFacade = userFacade;
     }
 

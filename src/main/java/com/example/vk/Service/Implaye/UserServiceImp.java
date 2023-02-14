@@ -154,35 +154,6 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public List<UserListDto> getFollow(Long id) {
-
-        log.info("Выдача подписчиков");
-
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserListDto> cq = cb.createQuery(UserListDto.class);
-        Root<User> root = cq.from(User.class);
-
-        Subquery<Long> subquery = cq.subquery(Long.class);
-        Root<Follow> roots = subquery.from(Follow.class);
-        subquery.select(
-                roots.get(Follow_.userTwo)
-        );
-        subquery.where(cb.equal(roots.get(Follow_.userOne), id));
-        cq.where(cb.in(root.get(User_.id)).value(subquery));
-
-        cq.multiselect(
-                root.get(User_.id),
-                root.get(User_.name),
-                root.get(User_.surname),
-                root.get(User_.about),
-                root.get(User_.patronymic),
-                root.get(User_.urlToAvatar)
-        );
-
-        return entityManager.createQuery(cq).getResultList();
-    }
-
-    @Override
     public List<UserMessageDto> getUserByDialogId(Long dialogId) {
 
         log.info("Выдача пользователей в диалоге c id {}", dialogId);

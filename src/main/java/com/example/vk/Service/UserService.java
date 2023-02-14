@@ -33,7 +33,5 @@ public interface UserService extends UserDetailsService {
 
     void deleteUserById(Long id);
 
-    List<UserListDto> getFollow(Long id);
-
     List<UserMessageDto> getUserByDialogId(Long dialogId);
 }

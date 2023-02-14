@@ -3,37 +3,32 @@ package com.example.vk.Controllers;
 
 import com.example.vk.DTO.follow.FollowDto;
 import com.example.vk.DTO.follow.UserListDto;
-import com.example.vk.Facade.FollowFacade;
+import com.example.vk.Service.Implaye.FollowService;
 import com.example.vk.exception.NotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/vk")
 @Slf4j
+@RestController
+@RequestMapping("/v1/feed")
+@RequiredArgsConstructor
 @CrossOrigin(origins="http://localhost:3000")
 public class FollowUserController {
 
-    private final FollowFacade followFacade;
+    private final FollowService followService;
 
-
-    @Autowired
-    public FollowUserController(FollowFacade findFollowById) {
-        this.followFacade = findFollowById;
-    }
-
-    @GetMapping("/feed/{id}")
+    @GetMapping("/{id}")
     @PreAuthorize(value = "hasAuthority('USER')")
     public List<UserListDto> getFollow(@PathVariable Long id){
         if (id == null){
             throw new NotFoundException("Id is null");
         }
         log.info("Get follow");
-        return followFacade.getFollowUser(id);
+        return followService.getFollow(id);
     }
 
     @PostMapping("/feed")
@@ -43,13 +38,13 @@ public class FollowUserController {
             throw new NotFoundException("Don't save follow");
         }
         log.info("Follow user");
-        followFacade.saveFollow(followDto);
+        followService.saveFollow(followDto);
     }
 
-    @DeleteMapping("/feed/{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize(value = "hasAuthority('USER')")
     public void unFollow(@PathVariable Long id){
         log.info("Unfollow user");
-        followFacade.unFollow(id);
+        followService.deleteFollow(id);
     }
 }
