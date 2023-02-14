@@ -1,22 +1,18 @@
 package com.example.vk.Controllers;
 
 
-import com.example.vk.DTO.PostDto;
 import com.example.vk.DTO.follow.FromToUser;
 import com.example.vk.DTO.profileDto.UserDTO;
 import com.example.vk.Facade.UserFacade;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Slf4j
 @RestController
-@RequestMapping("/vk")
+@RequestMapping("/v1/user")
 @CrossOrigin(origins="http://localhost:3000")
 public class ContentController {
 
@@ -28,36 +24,30 @@ public class ContentController {
         this.userFacade = userFacade;
     }
 
-    @GetMapping("/profile/{id}")
+    @GetMapping("/{id}")
     @PreAuthorize(value = "hasAuthority('USER')")
     public ResponseEntity<?> getProfile(@PathVariable("id") Long id){
         log.info("Get user with id: {}", id);
         return userFacade.getUser(id);
     }
-    @PutMapping("/profile/{id}")
+    @PutMapping()
     @PreAuthorize(value = "hasAuthority('USER')")
-    public ResponseEntity<?> updateProfile(@PathVariable("id") Long id,@RequestBody UserDTO userDTO){
-        log.info("Update user with id:{} and userDto: {}", id, userDTO);
-        return userFacade.updateProfile(id, userDTO);
+    public ResponseEntity<?> updateProfile(@RequestBody UserDTO userDTO){
+        log.info("Update user with  and userDto: {}", userDTO);
+        return userFacade.updateProfile(userDTO);
     }
-    @GetMapping("/users")
+    @GetMapping()
     @PreAuthorize(value = "hasAuthority('USER')")
     public ResponseEntity<?> getUsers(@RequestBody FromToUser fromToUser){
         log.info("Get user with radius");
         return userFacade.getUserInRadius(fromToUser);
     }
 
-    @DeleteMapping("/user/delete/{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize(value = "hasAuthority('USER')")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id){
+    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         log.info("Delete user");
         userFacade.deleteUserById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/user/post")
-    @PreAuthorize(value = "hasAuthority('USER')")
-    public ResponseEntity<?> createPost(@RequestBody PostDto postDto){
-        return userFacade.createPost(postDto);
     }
 }

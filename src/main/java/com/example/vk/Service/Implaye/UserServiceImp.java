@@ -207,38 +207,4 @@ public class UserServiceImp implements UserService {
                 .createQuery(cq)
                 .getResultList();
     }
-
-    @Override
-    public List<News> getNews(Long id, Long page) {
-
-        log.info("Выдача новостей");
-
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<News> cq = cb.createQuery(News.class);
-        Root<Post> root = cq.from(Post.class);
-        Join<Post, User> join = root.join(Post_.USER);
-
-        Subquery<Long> subquery = cq.subquery(Long.class);
-        Root<Follow> roots = subquery.from(Follow.class);
-        subquery.where(cb.equal(roots.get(Follow_.USER_ONE), id));
-        subquery.select(
-                roots.get(Follow_.USER_TWO)
-        );
-
-        cq.where(cb.in(join.get(User_.ID)).value(subquery));
-
-        cq.multiselect(
-                root.get(Post_.ID),
-                root.get(Post_.USER_ID),
-                root.get(Post_.TIME_POST),
-                root.get(Post_.TEXT),
-                root.get(Post_.LIKES),
-                root.get(Post_.DIS_LIKES)
-        );
-
-        return entityManager.createQuery(cq)
-                .setFirstResult((page.intValue() - 1) * 100)
-                .setMaxResults(page.intValue() * 100)
-                .getResultList();
-    }
 }

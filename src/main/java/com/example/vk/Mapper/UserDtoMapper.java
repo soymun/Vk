@@ -15,6 +15,4 @@ public interface UserDtoMapper {
     User userDTOToUser(UserDTO userDTO);
 
     UserDTO userListDtoToUserDTO(UserListDto userListDto);
-
-    UserPostDto postToUserPostDto(Post post);
 }

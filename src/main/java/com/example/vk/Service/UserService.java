@@ -36,6 +36,4 @@ public interface UserService extends UserDetailsService {
     List<UserListDto> getFollow(Long id);
 
     List<UserMessageDto> getUserByDialogId(Long dialogId);
-
-    List<News> getNews(Long id, Long page);
 }

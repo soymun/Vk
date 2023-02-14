@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -55,14 +56,10 @@ public class DialogFacade {
         message.setDialogId(messageDTO.getDialogId());
         message.setUserId(messageDTO.getUserId());
         message.setText(messageDTO.getTextMessage());
-        message.setTimePost(new Date());
+        message.setTimePost(LocalDate.now());
         Message messageSaved = messageService.saveMessage(message);
         log.info("Message saved {}", messageSaved);
-        return MessageResponseDto.builder().text(messageSaved.getText())
-                .timePost(messageSaved.getTimePost())
-                .userId(messageSaved.getUserId())
-                .dialogId(message.getDialogId())
-                .build();
+        return null;
     }
 
     public DialogDTOResponse getDialog(Long dialogId){
