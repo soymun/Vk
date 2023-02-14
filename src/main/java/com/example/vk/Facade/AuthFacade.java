@@ -2,10 +2,13 @@ package com.example.vk.Facade;
 
 
 import com.example.vk.DTO.authDto.AuthDTO;
+import com.example.vk.DTO.authDto.ReLoginDto;
 import com.example.vk.DTO.authDto.RegDTO;
+import com.example.vk.DTO.profileDto.UserDTO;
 import com.example.vk.Entity.Role;
 import com.example.vk.Entity.User;
 import com.example.vk.Response.RegistrationResponse;
+import com.example.vk.Response.ResponseDto;
 import com.example.vk.Security.JWTAuthException;
 import com.example.vk.Security.JWTTokenProvider;
 import com.example.vk.Service.Implaye.UserServiceImp;
@@ -81,5 +84,20 @@ public class AuthFacade {
         }catch (Exception e){
             throw new JWTAuthException("Token is already exists");
         }
+    }
+
+    public ResponseEntity<?> reLogin(ReLoginDto reLoginDto){
+        UserDTO user = userServiceImp.getUserById(reLoginDto.getUserId());
+        if(reLoginDto.isGetWithNotValid()){
+            String token = jwtTokenProvider.createToken(user.getName(), user.getRole());
+            return ResponseEntity.ok(ResponseDto.builder().data(token).build());
+        }
+        else {
+            if(jwtTokenProvider.validateToken(reLoginDto.getToken())){
+                String token = jwtTokenProvider.createToken(user.getName(), user.getRole());
+                return ResponseEntity.ok(ResponseDto.builder().data(token).build());
+            }
+        }
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,6 +1,7 @@
 package com.example.vk.Controllers;
 
 import com.example.vk.DTO.authDto.AuthDTO;
+import com.example.vk.DTO.authDto.ReLoginDto;
 import com.example.vk.DTO.authDto.RegDTO;
 import com.example.vk.Facade.AuthFacade;
 import com.example.vk.Response.RegistrationResponse;
@@ -16,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @Slf4j
-@RequestMapping("/vk")
+@RequestMapping("/v1")
 @CrossOrigin(origins="http://localhost:3000")
 public class AuthControllers {
 
@@ -44,10 +45,9 @@ public class AuthControllers {
         return authenticate.login(authDTO);
     }
 
-    @PostMapping("/logout")
-    public void logout(HttpServletRequest request, HttpServletResponse response){
-        log.info("Logout user");
-        SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
-        securityContextLogoutHandler.logout(request, response, null);
+    @PostMapping("/relogin")
+    public ResponseEntity<?> reLogin(@RequestBody ReLoginDto reLoginDto){
+        log.info("Пере аунтефикация пользователя с id {}", reLoginDto.getUserId());
+        return authenticate.reLogin(reLoginDto);
     }
 }

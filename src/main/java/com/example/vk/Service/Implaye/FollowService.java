@@ -9,9 +9,11 @@ import com.example.vk.Entity.User;
 import com.example.vk.Entity.User_;
 import com.example.vk.Mapper.FollowMapper;
 import com.example.vk.Repositories.FollowRepository;
+import com.example.vk.Service.FollowServiceIntr;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -24,7 +26,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class FollowService {
+public class FollowService implements FollowServiceIntr {
 
     private final FollowRepository followRepository;
 
@@ -33,16 +35,20 @@ public class FollowService {
     @PersistenceContext
     EntityManager entityManager;
 
+    @Override
     public void saveFollow(FollowDto follow){
         log.info("Сохранение подписки");
         followRepository.save(followMapper.followDtoToFollow(follow));
     }
 
+    @Override
+    @Transactional
     public void deleteFollow(Long followId){
         log.info("Удаление подписки");
         followRepository.deleteById(followId);
     }
 
+    @Override
     public List<UserListDto> getFollow(Long id) {
 
         log.info("Выдача подписчиков");
