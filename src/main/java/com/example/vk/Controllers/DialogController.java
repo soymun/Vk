@@ -1,10 +1,7 @@
 package com.example.vk.Controllers;
 
 
-import com.example.vk.DTO.dialogDto.CreateDialogDto;
-import com.example.vk.DTO.dialogDto.DialogsDTO;
-import com.example.vk.DTO.dialogDto.MessageDTO;
-import com.example.vk.DTO.dialogDto.MessageResponseDto;
+import com.example.vk.DTO.dialogDto.*;
 import com.example.vk.Facade.DialogFacade;
 import com.example.vk.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +24,9 @@ public class DialogController {
         this.dialogFacade = dialogFacade;
     }
 
-    @GetMapping("/dialogs/user/{id}")
+    @GetMapping("/dialogs/user")
     @PreAuthorize(value = "hasAuthority('USER')")
-    public ResponseEntity<?> getDialogs(@PathVariable("id") Long id){
+    public ResponseEntity<?> getDialogs(@RequestParam("id") Long id){
         if(id == null){
             throw new NotFoundException("Id is null");
         }
@@ -41,22 +38,27 @@ public class DialogController {
     @PreAuthorize(value = "hasAuthority('USER')")
     public ResponseEntity<?> addDialogs(@RequestBody CreateDialogDto createDialogDto){
         log.info("Create dialog");
-        DialogsDTO dialogsDTO = dialogFacade.createDialog(createDialogDto.getUserOne(), createDialogDto.getUserTwo(), createDialogDto.getName());
-        return ResponseEntity.ok(dialogsDTO);
+        return dialogFacade.createDialog(createDialogDto);
     }
 
     @PostMapping("/message")
     @PreAuthorize(value = "hasAuthority('USER')")
-    public ResponseEntity<?> addMessage(@RequestBody MessageDTO messageDTO){
+    public ResponseEntity<?> addMessage(@RequestBody MessageCreateDto messageDTO){
         log.info("Save message");
-        MessageResponseDto message = dialogFacade.saveMessage(messageDTO);
-        return ResponseEntity.ok(message);
+        return dialogFacade.saveMessage(messageDTO);
     }
 
-    @GetMapping("/dialog/{id}")
+    @GetMapping("/message")
     @PreAuthorize(value = "hasAuthority('USER')")
-    public ResponseEntity<?> getDialog(@PathVariable("id") Long id){
+    public ResponseEntity<?> getMessage(@RequestParam("id") Long id){
         log.info("Get dialog");
         return ResponseEntity.ok(dialogFacade.getDialog(id));
+    }
+
+    @GetMapping("/dialog")
+    @PreAuthorize(value = "hasAuthority('USER')")
+    public ResponseEntity<?> getDialog(@RequestParam("id") Long id){
+        log.info("Get dialog");
+        return ResponseEntity.ok(dialogFacade.getInfAboutDialog(id));
     }
 }

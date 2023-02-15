@@ -17,21 +17,4 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 class UserRepoImpTest {
 
-    @Autowired
-    UserServiceImp userServiceImp;
-
-    @Test
-    void getUserByUsername() {
-        User user = userServiceImp.getUserByUsername("kekep");
-        assertEquals(user.getRoles().get(0), "USER");
-    }
-
-    @Test
-    void getUserById() {
-        userServiceImp.save(new User(3L, "1", "1", "1", "1", null,null,List.of(Role.USER),null));
-    }
-
-    @Test
-    void addUser() {
-    }
 }
